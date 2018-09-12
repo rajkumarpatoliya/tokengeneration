@@ -4,7 +4,11 @@ contract DappToken {
     // constructor 
     // Set total number of tokens
     // Read total number of tokens
-
+    event Transfer (
+        address indexed _from,
+        address indexed _to,
+        uint256 _value
+    );
     // Name
     string public name = "DApp Token";
     // Symbol
@@ -27,7 +31,11 @@ contract DappToken {
         // Transfer the balance
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
-        // Return boolean
-        // Transfer a event
+
+        Transfer(msg.sender, _to, _value);
+
+        // Return boolean value
+        return true;
+
     }
 }
