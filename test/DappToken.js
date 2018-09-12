@@ -2,7 +2,23 @@ var DappToken = artifacts.require("./DappToken.sol");
 
 contract('DappToken', function(accounts) {
     var tokenInstance;
-    it('sets the total supply on deployment', function() {
+
+    it('Initializes the contract with correct values', function(){
+        return DappToken.deployed().then(function(instance){
+            tokenInstance = instance;
+            return tokenInstance.name();
+        }).then(function(name){
+            assert.equal(name, 'DApp Token', 'has the correct name');
+            return tokenInstance.symbol();
+        }).then(function(symbol){
+            assert.equal(symbol, 'DAPP', 'has the correct symbol');
+            return tokenInstance.standard();
+        }).then(function(standard){
+            assert.equal(standard, 'DApp Token v1.0', 'has the correct standard');
+        });
+    });
+
+    it('Allocates initial supply upon deployment', function() {
         return DappToken.deployed().then(function(instance){
             tokenInstance = instance;
             return tokenInstance.totalSupply();
@@ -11,6 +27,23 @@ contract('DappToken', function(accounts) {
             return tokenInstance.balanceOf(accounts[0]);
         }).then(function(adminBalance){
             assert.equal(adminBalance.toNumber(), 1000000, 'it allocates initial supply to admin account');
+        });
+    });
+    it('transfers token ownership', function(){
+        return DappToken.deployed().then(function(instance){
+            tokenInstance =instance;
+            // Test `require` statement first by transferring something larger then the sender's balance
+            return tokenInstance.transfer.call(accounts[1], 999999999999999999);
+        }).then(assert.fail).catch(function(error){
+            assert(error.message.indexOf('revert') >= 0, 'error message must contain revert');
+            return tokenInstance.transfer(accounts[1], 250000, {from: accounts[0]});
+        }).then(function(receipt){
+            return tokenInstance.balanceOf(accounts[1]);
+        }).then(function(balance){
+            assert.equal(balance.toNumber(), 250000, 'adds amount to receiving account');
+            return tokenInstance.balanceOf(accounts[0]);
+        }).then(function(balance){
+            assert.equal(balance.toNumber(), 750000, 'deducts the amount from sending account');
         });
     });
 });
