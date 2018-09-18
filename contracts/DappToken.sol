@@ -9,6 +9,12 @@ contract DappToken {
         address indexed _to,
         uint256 _value
     );
+    // Approve
+    event Approval (
+        address _owner,
+        address _spender,
+        uint256 _value
+    );
     // Name
     string public name = "DApp Token";
     // Symbol
@@ -19,8 +25,10 @@ contract DappToken {
     uint256 public totalSupply;
 
     mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
+    // Allowance
 
-    function DappToken (uint256 _initialSupply) public {
+    constructor (uint256 _initialSupply) public {
         balanceOf[msg.sender] = _initialSupply;
         totalSupply = _initialSupply;
     }
@@ -31,11 +39,21 @@ contract DappToken {
         // Transfer the balance
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
-
-        Transfer(msg.sender, _to, _value);
-
+        // Transfer event
+        emit Transfer(msg.sender, _to, _value);
         // Return boolean value
         return true;
 
     }
+    // Delegated Transfer
+    // Approve
+    function approve(address _spender, uint256 _value) public returns (bool success) {
+        // Allowance
+        allowance[msg.sender][_spender] = _value;
+        // Approve event
+        emit Approval(msg.sender, _spender, _value);
+        
+        return true;
+    }
+    // Transfer from
 }
