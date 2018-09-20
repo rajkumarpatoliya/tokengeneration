@@ -5,13 +5,14 @@ import "./DappToken.sol";
 contract DappTokenSale{
     address admin;
     DappToken public tokenContract;
-    constructor(DappToken _tokenContract) public {
+    uint256 public tokenPrice;
+
+    constructor(DappToken _tokenContract, uint256 _tokenPrice) public {
         // Assign Admin
         admin = msg.sender;
-        tokenContract = _tokenContract;
         // Token contract 
-
+        tokenContract = _tokenContract;
         // Token Price
-
+        tokenPrice = _tokenPrice;
     }
 } 
